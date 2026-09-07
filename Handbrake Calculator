@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Bitrate Handbrake</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --background: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text-main);
+            padding: 2rem 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            width: 100%;
+            max-width: 480px;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: var(--text-main);
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        input[type="number"], select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="number"]:focus, select:focus {
+            border-color: var(--primary-color);
+        }
+
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 0.5rem;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .result-box {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: #f1f5f9;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .result-item {
+            margin-bottom: 0.75rem;
+        }
+
+        .result-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .result-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+
+        .result-value-container {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .result-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            flex-grow: 1;
+        }
+
+        .btn-copy {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.85rem;
+            background-color: #cbd5e1;
+            color: var(--text-main);
+            width: auto;
+            margin-top: 0;
+        }
+
+        .btn-copy:hover {
+            background-color: #94a3b8;
+        }
+
+        .recommendation {
+            font-size: 0.95rem;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Kalkulator Bitrate Handbrake</h1>
+    
+    <div class="grid-2">
+        <div class="form-group">
+            <label for="minutes">Durasi (Menit)</label>
+            <input type="number" id="minutes" min="0" value="0">
+        </div>
+        <div class="form-group">
+            <label for="seconds">Durasi (Detik)</label>
+            <input type="number" id="seconds" min="0" max="59" value="0">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="targetSize">Target Ukuran File (MB)</label>
+        <input type="number" id="targetSize" min="1" value="1">
+    </div>
+
+    <div class="form-group">
+        <label for="audioBitrate">Bitrate Audio Handbrake</label>
+        <select id="audioBitrate">
+            <option value="128">128 kbps (Standar/Rekomendasi)</option>
+            <option value="160">160 kbps (Kualitas Baik)</option>
+            <option value="192">192 kbps (Tinggi)</option>
+            <option value="256">256 kbps (Sangat Tinggi)</option>
+            <option value="320">320 kbps (Maksimal)</option>
+        </select>
+    </div>
+
+    <button onclick="calculateBitrate()">Hitung Target Bitrate</button>
+
+    <div class="result-box">
+        <div class="result-item">
+            <div class="result-label">Target Video Bitrate:</div>
+            <div class="result-value-container">
+                <span class="result-value" id="videoBitrateResult">0 kbps</span>
+                <button class="btn-copy" onclick="copyToClipboard()">Copy</button>
+            </div>
+        </div>
+        <div class="result-item" style="margin-top: 1rem; border-top: 1px solid var(--border); padding-top: 0.75rem;">
+            <div class="result-label">Rekomendasi Resolusi:</div>
+            <div class="recommendation" id="resolutionRecommendation">-</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function calculateBitrate() {
+        const minutes = parseInt(document.getElementById('minutes').value) || 0;
+        const seconds = parseInt(document.getElementById('seconds').value) || 0;
+        const targetSizeMB = parseFloat(document.getElementById('targetSize').value) || 0;
+        const audioBitrateKbps = parseInt(document.getElementById('audioBitrate').value) || 0;
+
+        // Total durasi dalam detik
+        const totalSeconds = (minutes * 60) + seconds;
+
+        if (totalSeconds <= 0 || targetSizeMB <= 0) {
+            alert('Silakan masukkan durasi dan target ukuran file yang valid.');
+            return;
+        }
+
+        // Konversi Megabyte ke Kilobit (1 MB = 8192 Kilobit)
+        const totalSizeKb = targetSizeMB * 8 * 1024;
+
+        // Total bitrate keseluruhan (kbps)
+        const totalBitrateKbps = totalSizeKb / totalSeconds;
+
+        // Bitrate video = Total Bitrate - Bitrate Audio
+        let videoBitrateKbps = totalBitrateKbps - audioBitrateKbps;
+
+        // Penanganan jika ukuran file terlalu kecil untuk audio bitrate yang dipilih
+        if (videoBitrateKbps < 0) {
+            document.getElementById('videoBitrateResult').innerText = 'N/A';
+            document.getElementById('resolutionRecommendation').innerText = 'Target ukuran file terlalu kecil untuk bitrate audio ini.';
+            return;
+        }
+
+        // Bulatkan hasil bitrate video
+        videoBitrateKbps = Math.round(videoBitrateKbps);
+        document.getElementById('videoBitrateResult').innerText = videoBitrateKbps + ' kbps';
+
+        // Rekomendasi Resolusi berdasarkan Video Bitrate
+        let recommendation = '-';
+        if (videoBitrateKbps < 400) {
+            recommendation = '360p atau lebih rendah (Sangat disarankan untuk menghemat kualitas)';
+        } else if (videoBitrateKbps >= 400 && videoBitrateKbps < 1000) {
+            recommendation = '480p (Kualitas standar, cocok untuk layar kecil)';
+        } else if (videoBitrateKbps >= 1000 && videoBitrateKbps < 2500) {
+            recommendation = '720p (HD, kualitas seimbang dan tajam)';
+        } else if (videoBitrateKbps >= 2500 && videoBitrateKbps < 6000) {
+            recommendation = '1080p (Full HD, kualitas tinggi untuk layar besar)';
+        } else {
+            recommendation = '4K / 2K Ultra HD (Bitrate sangat melimpah)';
+        }
+
+        document.getElementById('resolutionRecommendation').innerText = recommendation;
+    }
+
+    function copyToClipboard() {
+        const textToCopy = document.getElementById('videoBitrateResult').innerText;
+        const bitrateNumber = textToCopy.replace(' kbps', '');
+        
+        if (bitrateNumber === '0' || bitrateNumber === 'N/A') {
+            alert('Belum ada hasil yang bisa disalin.');
+            return;
+        }
+
+        navigator.clipboard.writeText(bitrateNumber).then(() => {
+            alert('Bitrate video (' + bitrateNumber + ') berhasil disalin ke clipboard!');
+        }).catch(err => {
+            console.error('Gagal menyalin teks: ', err);
+        });
+    }
+</script>
+
+</body>
+</html>
