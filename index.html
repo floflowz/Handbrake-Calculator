@@ -1,18 +1,46 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator Bitrate Handbrake</title>
+    <title>Handbrake Bitrate Calculator</title>
     <style>
         :root {
-            --primary-color: #2563eb;
-            --primary-hover: #1d4ed8;
-            --background: #f8fafc;
+            /* Light Theme Variables */
+            --bg-body: #f8fafc;
             --card-bg: #ffffff;
             --text-main: #1e293b;
             --text-muted: #64748b;
+            --input-bg: #ffffff;
+            --input-text: #1e293b;
             --border: #e2e8f0;
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --result-bg: #f1f5f9;
+            --result-val: #2563eb;
+            --btn-copy-bg: #cbd5e1;
+            --btn-copy-hover: #94a3b8;
+            --btn-copy-text: #1e293b;
+            --card-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        [data-theme="dark"] {
+            /* AMOLED Dark Theme Variables */
+            --bg-body: #000000;
+            --card-bg: #121418;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --input-bg: #272d37;
+            --input-text: #f8fafc;
+            --border: #334155;
+            --primary-color: #2563eb;
+            --primary-hover: #3b82f6;
+            --result-bg: #181d24;
+            --result-val: #38bdf8;
+            --btn-copy-bg: #334155;
+            --btn-copy-hover: #475569;
+            --btn-copy-text: #f8fafc;
+            --card-shadow: 0 0 0 1px #1e293b, 0 10px 30px -10px rgb(0 0 0 / 0.8);
         }
 
         * {
@@ -20,10 +48,11 @@
             margin: 0;
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
         }
 
         body {
-            background-color: var(--background);
+            background-color: var(--bg-body);
             color: var(--text-main);
             padding: 2rem 1rem;
             display: flex;
@@ -35,16 +64,17 @@
         .container {
             background: var(--card-bg);
             padding: 2rem;
-            border-radius: 1rem;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            border-radius: 1.25rem;
+            box-shadow: var(--card-shadow);
             width: 100%;
-            max-width: 480px;
+            max-width: 460px;
         }
 
         h1 {
             font-size: 1.5rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.75rem;
             text-align: center;
+            font-weight: 700;
             color: var(--text-main);
         }
 
@@ -55,8 +85,9 @@
         label {
             display: block;
             margin-bottom: 0.5rem;
-            font-weight: 500;
+            font-weight: 600;
             font-size: 0.9rem;
+            color: var(--text-main);
         }
 
         .grid-2 {
@@ -65,58 +96,50 @@
             gap: 1rem;
         }
 
-        input[type="number"], select {
+        input[type="number"] {
             width: 100%;
-            padding: 0.75rem;
+            padding: 0.85rem 1rem;
+            background-color: var(--input-bg);
+            color: var(--input-text);
             border: 1px solid var(--border);
-            border-radius: 0.5rem;
-            font-size: 1rem;
+            border-radius: 0.6rem;
+            font-size: 1.05rem;
             outline: none;
-            transition: border-color 0.2s;
         }
 
-        input[type="number"]:focus, select:focus {
+        input[type="number"]:focus {
             border-color: var(--primary-color);
         }
 
-        button {
+        button.btn-calc {
             width: 100%;
-            padding: 0.75rem;
+            padding: 0.85rem;
             background-color: var(--primary-color);
             color: white;
             border: none;
-            border-radius: 0.5rem;
+            border-radius: 0.6rem;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.2s;
             margin-top: 0.5rem;
         }
 
-        button:hover {
+        button.btn-calc:hover {
             background-color: var(--primary-hover);
         }
 
         .result-box {
             margin-top: 1.5rem;
-            padding: 1rem;
-            background-color: #f1f5f9;
-            border-radius: 0.5rem;
+            padding: 1.2rem;
+            background-color: var(--result-bg);
+            border-radius: 0.75rem;
             border: 1px solid var(--border);
-        }
-
-        .result-item {
-            margin-bottom: 0.75rem;
-        }
-
-        .result-item:last-child {
-            margin-bottom: 0;
         }
 
         .result-label {
             font-size: 0.85rem;
             color: var(--text-muted);
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.35rem;
         }
 
         .result-value-container {
@@ -126,36 +149,131 @@
         }
 
         .result-value {
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             font-weight: 700;
-            color: var(--primary-color);
+            color: var(--result-val);
             flex-grow: 1;
         }
 
         .btn-copy {
-            padding: 0.25rem 0.75rem;
-            font-size: 0.85rem;
-            background-color: #cbd5e1;
-            color: var(--text-main);
-            width: auto;
-            margin-top: 0;
+            padding: 0.4rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            background-color: var(--btn-copy-bg);
+            color: var(--btn-copy-text);
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
         }
 
         .btn-copy:hover {
-            background-color: #94a3b8;
+            background-color: var(--btn-copy-hover);
         }
 
-        .recommendation {
-            font-size: 0.95rem;
-            font-weight: 500;
-            line-height: 1.4;
+        /* Footer & Theme Switcher */
+        .footer-bar {
+            margin-top: 1.75rem;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+        }
+
+        .copyright-text {
+            grid-column: 2;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .theme-switch-container {
+            grid-column: 3;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        /* Switch Precision Fix */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 56px;
+            height: 30px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 7px;
+            box-sizing: border-box;
+            transition: background-color 0.25s ease, border-color 0.25s ease;
+        }
+
+        .slider .icon {
+            width: 14px;
+            height: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+
+        .slider .icon-sun {
+            color: #f59e0b;
+        }
+
+        .slider .icon-moon {
+            color: #38bdf8;
+        }
+
+        .slider .thumb {
+            position: absolute;
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            top: 50%;
+            transform: translateY(-50%) translateX(26px);
+            background-color: #2563eb;
+            border-radius: 50%;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.25s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+            z-index: 2;
+        }
+
+        /* State ketika checkbox di-uncheck (Pindah ke Light Mode) */
+        input:not(:checked) + .slider {
+            background-color: #cbd5e1;
+            border-color: #cbd5e1;
+        }
+
+        input:not(:checked) + .slider .icon-moon {
+            color: #94a3b8;
+        }
+
+        input:not(:checked) + .slider .thumb {
+            transform: translateY(-50%) translateX(0);
+            background-color: #ffffff;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Kalkulator Bitrate Handbrake</h1>
+    <h1>Handbrake Bitrate Calculator</h1>
     
     <div class="grid-2">
         <div class="form-group">
@@ -173,30 +291,45 @@
         <input type="number" id="targetSize" min="1" value="1">
     </div>
 
-    <div class="form-group">
-        <label for="audioBitrate">Bitrate Audio Handbrake</label>
-        <select id="audioBitrate">
-            <option value="128">128 kbps (Standar/Rekomendasi)</option>
-            <option value="160">160 kbps (Kualitas Baik)</option>
-            <option value="192">192 kbps (Tinggi)</option>
-            <option value="256">256 kbps (Sangat Tinggi)</option>
-            <option value="320">320 kbps (Maksimal)</option>
-        </select>
-    </div>
-
-    <button onclick="calculateBitrate()">Hitung Target Bitrate</button>
+    <button class="btn-calc" onclick="calculateBitrate()">Hitung Target Bitrate</button>
 
     <div class="result-box">
-        <div class="result-item">
-            <div class="result-label">Target Video Bitrate:</div>
-            <div class="result-value-container">
-                <span class="result-value" id="videoBitrateResult">0 kbps</span>
-                <button class="btn-copy" onclick="copyToClipboard()">Copy</button>
-            </div>
+        <div class="result-label">Target Bitrate:</div>
+        <div class="result-value-container">
+            <span class="result-value" id="videoBitrateResult">0 kbps</span>
+            <button class="btn-copy" onclick="copyToClipboard()">Copy</button>
         </div>
-        <div class="result-item" style="margin-top: 1rem; border-top: 1px solid var(--border); padding-top: 0.75rem;">
-            <div class="result-label">Rekomendasi Resolusi:</div>
-            <div class="recommendation" id="resolutionRecommendation">-</div>
+    </div>
+
+    <div class="footer-bar">
+        <div class="copyright-text">
+            &copy; kuwcing 🐈
+        </div>
+        <div class="theme-switch-container">
+            <label class="switch" title="Ganti Tema Light/Dark">
+                <input type="checkbox" id="themeToggle" onchange="toggleTheme()" checked>
+                <span class="slider">
+                    <span class="icon icon-sun">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="4"></circle>
+                            <path d="M12 2v2"></path>
+                            <path d="M12 20v2"></path>
+                            <path d="m4.93 4.93 1.41 1.41"></path>
+                            <path d="m17.66 17.66 1.41 1.41"></path>
+                            <path d="M2 12h2"></path>
+                            <path d="M20 12h2"></path>
+                            <path d="m6.34 17.66-1.41 1.41"></path>
+                            <path d="m19.07 4.93-1.41 1.41"></path>
+                        </svg>
+                    </span>
+                    <span class="icon icon-moon">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                    </span>
+                    <span class="thumb"></span>
+                </span>
+            </label>
         </div>
     </div>
 </div>
@@ -206,9 +339,7 @@
         const minutes = parseInt(document.getElementById('minutes').value) || 0;
         const seconds = parseInt(document.getElementById('seconds').value) || 0;
         const targetSizeMB = parseFloat(document.getElementById('targetSize').value) || 0;
-        const audioBitrateKbps = parseInt(document.getElementById('audioBitrate').value) || 0;
 
-        // Total durasi dalam detik
         const totalSeconds = (minutes * 60) + seconds;
 
         if (totalSeconds <= 0 || targetSizeMB <= 0) {
@@ -216,57 +347,31 @@
             return;
         }
 
-        // Konversi Megabyte ke Kilobit (1 MB = 8192 Kilobit)
         const totalSizeKb = targetSizeMB * 8 * 1024;
+        const bitrateKbps = Math.round(totalSizeKb / totalSeconds);
 
-        // Total bitrate keseluruhan (kbps)
-        const totalBitrateKbps = totalSizeKb / totalSeconds;
-
-        // Bitrate video = Total Bitrate - Bitrate Audio
-        let videoBitrateKbps = totalBitrateKbps - audioBitrateKbps;
-
-        // Penanganan jika ukuran file terlalu kecil untuk audio bitrate yang dipilih
-        if (videoBitrateKbps < 0) {
-            document.getElementById('videoBitrateResult').innerText = 'N/A';
-            document.getElementById('resolutionRecommendation').innerText = 'Target ukuran file terlalu kecil untuk bitrate audio ini.';
-            return;
-        }
-
-        // Bulatkan hasil bitrate video
-        videoBitrateKbps = Math.round(videoBitrateKbps);
-        document.getElementById('videoBitrateResult').innerText = videoBitrateKbps + ' kbps';
-
-        // Rekomendasi Resolusi berdasarkan Video Bitrate
-        let recommendation = '-';
-        if (videoBitrateKbps < 400) {
-            recommendation = '360p atau lebih rendah (Sangat disarankan untuk menghemat kualitas)';
-        } else if (videoBitrateKbps >= 400 && videoBitrateKbps < 1000) {
-            recommendation = '480p (Kualitas standar, cocok untuk layar kecil)';
-        } else if (videoBitrateKbps >= 1000 && videoBitrateKbps < 2500) {
-            recommendation = '720p (HD, kualitas seimbang dan tajam)';
-        } else if (videoBitrateKbps >= 2500 && videoBitrateKbps < 6000) {
-            recommendation = '1080p (Full HD, kualitas tinggi untuk layar besar)';
-        } else {
-            recommendation = '4K / 2K Ultra HD (Bitrate sangat melimpah)';
-        }
-
-        document.getElementById('resolutionRecommendation').innerText = recommendation;
+        document.getElementById('videoBitrateResult').innerText = bitrateKbps + ' kbps';
     }
 
     function copyToClipboard() {
         const textToCopy = document.getElementById('videoBitrateResult').innerText;
         const bitrateNumber = textToCopy.replace(' kbps', '');
         
-        if (bitrateNumber === '0' || bitrateNumber === 'N/A') {
+        if (bitrateNumber === '0') {
             alert('Belum ada hasil yang bisa disalin.');
             return;
         }
 
         navigator.clipboard.writeText(bitrateNumber).then(() => {
-            alert('Bitrate video (' + bitrateNumber + ') berhasil disalin ke clipboard!');
+            alert('Bitrate (' + bitrateNumber + ') berhasil disalin ke clipboard!');
         }).catch(err => {
             console.error('Gagal menyalin teks: ', err);
         });
+    }
+
+    function toggleTheme() {
+        const isChecked = document.getElementById('themeToggle').checked;
+        document.documentElement.setAttribute('data-theme', isChecked ? 'dark' : 'light');
     }
 </script>
 
